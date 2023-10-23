@@ -7,8 +7,14 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 import six
 
+import logging
+logger = logging.getLogger("radiomics")
+logger.setLevel(logging.ERROR)
+logger = logging.getLogger("radiomics.glcm")
+logger.setLevel(logging.ERROR)
+
 class TextureExtractor:
-    def __init__(self, clip_size=64, num_sample=100, setting={"binWidth": 10}) -> None:
+    def __init__(self, clip_size=128, num_sample=100, setting={"binWidth": 5}) -> None:
         self.clip_size = clip_size
         self.num_sample = num_sample
         self.setting = setting
@@ -45,6 +51,12 @@ class TextureExtractor:
         return result
     
     def get_median_texture_feature_from_patch(self, image):
+        max_size = 1024
+        if( min(image.shape) > max_size ):
+            image = image[
+                image.shape[0]//2-max_size//2:image.shape[0]//2+max_size//2,
+                image.shape[1]//2-max_size//2:image.shape[1]//2+max_size//2
+            ]
         
         if( min(image.shape) < self.clip_size ):
             print('ERROR')
